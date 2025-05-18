@@ -1,36 +1,43 @@
-from fastapi import FastAPI, HTTPException, Request, Depends, Header
-from fastapi.responses import PlainTextResponse
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from app.git_utils import get_life_yaml, update_life_yaml
+from fastapi import FastAPI, Request, HTTPException, Header
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import json
 import os
 
+app = FastAPI()
+
+FILE_PATH = os.getenv("FILE_NAME", "/repo/life.json")
 API_TOKEN = os.getenv("API_TOKEN")
 
-app = FastAPI()
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(429, _rate_limit_exceeded_handler)
+@app.get("/life")
+async def read_life(authorization: str = Header(...)):
+    if authorization != f"Bearer {API_TOKEN}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
-def verify_token(authorization: str = Header(...)):
-    expected = f"Bearer {API_TOKEN}"
-    if authorization != expected:
-        raise HTTPException(status_code=403, detail="Unauthorized")
-
-@app.get("/life", response_class=PlainTextResponse)
-@limiter.limit("10/minute")
-def read_life(request: Request, token: str = Depends(verify_token)):
     try:
-        return get_life_yaml()
+        with open(FILE_PATH, "r") as f:
+            data = json.load(f)
+        return JSONResponse(content=data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/life", response_class=PlainTextResponse)
-@limiter.limit("5/minute")
-async def write_life(request: Request, token: str = Depends(verify_token)):
+@app.post("/life")
+async def update_life(request: Request, authorization: str = Header(...)):
+    if authorization != f"Bearer {API_TOKEN}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
-        new_content = await request.body()
-        update_life_yaml(new_content.decode("utf-8"))
-        return "Updated successfully"
+        wrapper = await request.json()
+        # Robust fallback chain
+        data = (
+            wrapper.get("params", {})
+                   .get("life", wrapper.get("params", {}))
+                   or wrapper.get("file")
+                   or wrapper
+        )
+
+        with open(FILE_PATH, "w") as f:
+            json.dump(data, f, indent=2)
+
+        return JSONResponse(content={"detail": "Update successful"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

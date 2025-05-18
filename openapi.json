@@ -1,0 +1,128 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Life Backend API",
+    "version": "2.2.0",
+    "description": "API that accepts a 'params.life' wrapped JSON structure for GPT compatibility."
+  },
+  "servers": [
+    {
+      "url": "https://odie.smorris.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/life": {
+      "get": {
+        "summary": "Get life.json",
+        "description": "Returns the current life.json structure.",
+        "operationId": "getLifeFile",
+        "responses": {
+          "200": {
+            "description": "The current data structure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Update life.json",
+        "description": "Replaces life.json. Expects data wrapped inside params.life.",
+        "operationId": "postLifeFile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "life": {
+                        "type": "object",
+                        "properties": {
+                          "areas_of_responsibility": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "projects": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "projects"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "areas_of_responsibility"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "params"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acknowledgement",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "x-openai-isConsequential": false
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {}
+  }
+}
