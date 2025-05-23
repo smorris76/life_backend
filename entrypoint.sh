@@ -11,4 +11,7 @@ git config --global user.email "${GIT_EMAIL}"
 #git pull || echo "Warning: could not pull from repo"
 
 # Start the API
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+exec uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --log-config /app/logging-config.json
