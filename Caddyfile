@@ -1,0 +1,3 @@
+odie.smorris.com {
+    reverse_proxy life-api:8000
+}
