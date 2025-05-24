@@ -1,114 +1,91 @@
-# Life Backend
+# Life Controller
 
-This is a Dockerized FastAPI application that serves as the backend for a
-personal productivity and CRM system. It reads and writes a YAML-based data
-file (`life.yaml`) versioned using Git, enabling structured, secure tracking
-of tasks, projects, and customer interactions.
+This is a Dockerized FastAPI + Caddy application that powers a personal productivity and CRM system. It exposes an authenticated JSON-based API that manages a structured `life.json` file. The system supports hierarchical task management, CRM tracking, and renders human-readable outputs (YAML, HTML). Changes are versioned in Git and can be deployed or visualized elsewhere.
 
 ---
 
 ## 🔧 Features
 
-- ✅ **REST API** for reading and updating `life.yaml`
-- ✅ **Token-based authentication** for secure access
-- ✅ **Rate limiting** with `slowapi` to protect against abuse
-- ✅ **Git integration** for version history, rollback, and auditability
-- ✅ **Dockerized** for portability and maintainability
-- ✅ **Local repo mount** for easy access and off-host backup
-- ✅ **Safe directory and committer identity configuration** handled at startup
+- ✅ **REST API** for reading and updating `life.json`
+- ✅ **Token-based authentication**
+- ✅ **Rate limiting** via `slowapi`
+- ✅ **Git integration** for commit history
+- ✅ **YAML + HTML renderers** post-update
+- ✅ **Caddy reverse proxy** with HTTPS support
+- ✅ **Docker Compose** orchestration
+- ✅ **GHCR-compatible image structure**
 
 ---
 
 ## 📦 API Endpoints
 
 ### `GET /life`
-
-Returns the current version of `life.yaml`.
+Returns the current `life.json`.
 
 - **Auth required**: Yes (Bearer token)
-- **Rate limit**: 10 requests per minute per IP
+- **Rate limit**: 10 requests/min/IP
 
 ### `POST /life`
+Replaces `life.json`, commits it to Git, and triggers:
 
-Overwrites `life.yaml` with new content, commits the change to Git.
-
-- **Auth required**: Yes (Bearer token)
-- **Rate limit**: 5 requests per minute per IP
+- YAML conversion (`life.yaml`)
+- HTML rendering (`life.html`)
+- Optional SCP deployment to external web server
 
 ---
 
-## 🚀 Quickstart
+## 📁 File Structure
 
-### 1. Build the image
+```
+life_backend/
+├── app/
+│   ├── config.py
+│   ├── git_utils.py
+│   ├── main.py
+│   └── logging-config.yaml
+├── Dockerfile
+├── entrypoint.sh
+├── requirements.txt
+├── logging-config.json
+├── openapi.json
+├── docker-compose.yml
+├── Caddyfile
+├── README.md
+└── env.example
+```
+
+---
+
+## 🚀 Running Locally
 
 ```bash
-docker build -t life-backend .
+docker compose up --build -d
 ```
 
-### 2. Create a `.env` file
-
-```env
-REPO_PATH=/repo
-FILE_NAME=life.yaml
-GIT_USER=Shawn Morris
-GIT_EMAIL=shawn@smorris.com
-API_TOKEN=your-secret-token
-```
-
-### 3. Run the container
-
-```bash
-docker run -d \
-  --name life-api \
-  --env-file ~/.life-data.env \
-  -v $HOME/life-data:/repo \
-  -p 8000:8000 \
-  --restart unless-stopped \
-  life-backend
-```
+The API is served at `http://localhost:8000`, proxied via Caddy.
 
 ---
 
 ## 🔐 Authentication
 
-Use a Bearer token in the `Authorization` header:
-
-```bash
-curl -H "Authorization: Bearer <your-token>" http://localhost:8000/life
-```
+All endpoints require a bearer token defined in your `.env` or passed as `API_TOKEN`.
 
 ---
 
-## ⚙️ Environment Variables
+## 💾 Versioning & Backup
 
-| Variable        | Description                              |
-|-----------------|------------------------------------------|
-| `REPO_PATH`     | Path to the mounted Git repo             |
-| `FILE_NAME`     | YAML file name (e.g. `life.yaml`)        |
-| `GIT_USER`      | Git commit user.name                     |
-| `GIT_EMAIL`     | Git commit user.email                    |
-| `API_TOKEN`     | Bearer token for API access              |
+The backend commits all changes to `life.json`, `life.yaml`, and `life.html` into a mounted Git repo at `/repo`.
 
 ---
 
-## 🛠 Internals
+## 🔮 Future Enhancements
 
-- `entrypoint.sh`: Configures Git (safe.directory, identity) and starts Uvicorn
-- `main.py`: Defines the FastAPI app and routes
-- `git_utils.py`: Handles Git interactions (add, commit)
-- Rate limits are applied via `slowapi` using IP-based rules
-
----
-
-## 🧩 Future Ideas
-
-- OpenAPI schema for GPT integration
-- Optional HTTPS + reverse proxy via Caddy
-- Read-only web viewer for `life.yaml`
+- External health checks
+- Weekly review and agenda forecasting
+- GHCR GitHub Actions build pipeline
 
 ---
 
-## 📄 License
+## License
 
-This project is intended for private or personal use. Contact the author if
-you'd like to adapt it for broader distribution.
+MIT — see `LICENSE.md` if present.
