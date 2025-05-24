@@ -1,4 +1,4 @@
-version: "3.7"
+name: life-backend
 
 services:
   caddy:
@@ -14,13 +14,11 @@ services:
       - life-net
 
   life-api:
-    image: life-backend:testing
-    build:
-      context: ../life_backend
+    image: ghcr.io/smorris76/life-backend:latest
     env_file:
-      - /home/shawn/.life-data.env
+      - /home/shawn/.local/life_backend/prod.env
     volumes:
-      - /home/shawn/life-data:/repo
+      - /home/shawn/.local/life_backend/prod-data:/repo
     networks:
       - life-net
 

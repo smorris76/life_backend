@@ -13,5 +13,5 @@ git config --global user.email "${GIT_EMAIL}"
 # Start the API
 exec uvicorn app.main:app \
     --host 0.0.0.0 \
-    --port 8000 \
+    --port "${PORT}" \
     --log-config /app/logging-config.json
