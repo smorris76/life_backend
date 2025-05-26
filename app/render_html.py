@@ -3,8 +3,17 @@ import json
 from pathlib import Path
 
 def render_life_html(life_data: dict, output_path: str, file_prefix: str):
+    #def escape(text):
+    #    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     def escape(text):
-        return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\\n", "<br>")
+    )
+
 
     html = [
         "<html><head><meta charset='UTF-8'><title>Life Overview</title><style>",
@@ -16,13 +25,18 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
         "</style></head><body><h1>📂 Life Overview</h1>"
     ]
 
-    html.append(f"<a href={file_prefix}.json>JSON File</a><br>")
-    html.append(f"<a href={file_prefix}.yaml>YAML File</a><br>")
+    html.append("""
+<button onclick="toggleDetails()" style="margin-bottom: 1rem;">Collapse All</button>
+<div style="margin-bottom: 1rem;">
+  <a href="life.json">JSON File</a><br>
+  <a href="life.yaml">YAML File</a><br>
+</div>
+""")
     # Areas of Responsibility
     for aor in life_data.get("areas_of_responsibility", []):
-        html.append(f"<details><summary>🗂 {escape(aor['name'])}</summary>")
+        html.append(f"<details open><summary>🗂 {escape(aor['name'])}</summary>")
         for project in aor.get("projects", []):
-            html.append(f"<details class='project'><summary>{escape(project['title'])}</summary>")
+            html.append(f"<details open class='project'><summary>{escape(project['title'])}</summary>")
             if project.get("notes"):
                 html.append(f"<p><em>{escape(project['notes'])}</em></p>")
             if project.get("tasks"):
@@ -44,7 +58,7 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
     if customers:
         html.append("<div class='crm'><h2>🧑‍💼 CRM</h2>")
         for customer in customers:
-            html.append(f"<details><summary>{escape(customer['name'])}</summary>")
+            html.append(f"<details open><summary>{escape(customer['name'])}</summary>")
             html.append("<ul>")
             html.append(f"<li><strong>Website:</strong> <a href='{escape(customer['website'])}'>{escape(customer['website'])}</a></li>")
             for contact in customer.get("contacts", []):
@@ -88,6 +102,17 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
 
   checkUpdate();
 })();
+let expanded = true;
+
+function toggleDetails() {
+  const details = document.querySelectorAll("details");
+  details.forEach(d => d.open = !expanded);
+
+  const btn = document.querySelector("button");
+  btn.textContent = expanded ? "Expand All" : "Collapse All";
+  expanded = !expanded;
+}
+
 </script>
 </body></html>
 """)
