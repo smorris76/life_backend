@@ -9,7 +9,7 @@ import os
 import subprocess
 from app.render_html import render_life_html
 
-def deploy_life_html(source_path: str, target: str):
+def deploy_life_html(source_path: list[str], target: str):
     key = "/root/.ssh/id_deploy"
     try:
         subprocess.run(
@@ -18,12 +18,12 @@ def deploy_life_html(source_path: str, target: str):
                 "-o", "StrictHostKeyChecking=no",
                 "-o", "UserKnownHostsFile=/dev/null",
                 "-i", key,
-                "-q", source_path,
+                "-q",
+                *source_path,
                 target
             ],
             check=True
         )
-        print(">> HTML deployed successfully.")
     except subprocess.CalledProcessError as e:
         print(">> HTML deployment failed:", e)
 
@@ -78,8 +78,8 @@ async def update_life(request: Request, authorization: str = Header(...)):
             json.dump(data, f, indent=2)
         with open(YAML_PATH, "w") as y:
             yaml.dump(data, y)
-        render_life_html(data, HTML_PATH)
-        deploy_life_html(HTML_PATH, SSH_DEST)
+        render_life_html(data, HTML_PATH, FILE_PREFIX)
+        deploy_life_html([ JSON_PATH, YAML_PATH, HTML_PATH ], SSH_DEST)
 
         try:
             json_git_path = os.path.relpath(JSON_PATH, repo.working_tree_dir)

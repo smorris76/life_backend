@@ -2,8 +2,7 @@ import os
 import json
 from pathlib import Path
 
-def render_life_html(life_data: dict, output_path: str):
-    print(">> render_life_html(): writing to", output_path)
+def render_life_html(life_data: dict, output_path: str, file_prefix: str):
     def escape(text):
         return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
@@ -17,6 +16,8 @@ def render_life_html(life_data: dict, output_path: str):
         "</style></head><body><h1>📂 Life Overview</h1>"
     ]
 
+    html.append(f"<a href={file_prefix}.json>JSON File</a><br>")
+    html.append(f"<a href={file_prefix}.yaml>YAML File</a><br>")
     # Areas of Responsibility
     for aor in life_data.get("areas_of_responsibility", []):
         html.append(f"<details><summary>🗂 {escape(aor['name'])}</summary>")
