@@ -3,6 +3,7 @@ name: life-backend
 services:
   caddy:
     image: caddy:2
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -15,6 +16,7 @@ services:
 
   life-api:
     image: ghcr.io/smorris76/life-backend:latest
+    restart: unless-stopped
     env_file:
       - /home/shawn/.local/life_backend/prod.env
     volumes:
