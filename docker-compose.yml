@@ -19,6 +19,7 @@ services:
       - /home/shawn/.local/life_backend/prod.env
     volumes:
       - /home/shawn/.local/life_backend/prod-data:/repo
+      - /home/shawn/.local/life_backend/life_html_deploy:/root/.ssh/id_deploy:ro
     networks:
       - life-net
 
