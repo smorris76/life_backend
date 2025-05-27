@@ -6,14 +6,13 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
     #def escape(text):
     #    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     def escape(text):
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace("\\n", "<br>")
-    )
-
+        return (
+            str(text)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\n", "<br>")
+        )
 
     html = [
         "<html><head><meta charset='UTF-8'><title>Life Overview</title><style>",
@@ -22,6 +21,7 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
         "details { margin-bottom: 1em; }",
         "ul { margin: 0.5rem 0 0.5rem 1.5rem; }",
         ".crm { border-top: 2px solid #ccc; padding-top: 1rem; margin-top: 2rem; }",
+        ".project { margin-left: 2rem; }  /* ← ✅ Indent projects under AoRs */",
         "</style></head><body><h1>📂 Life Overview</h1>"
     ]
 
