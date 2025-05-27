@@ -10,6 +10,7 @@
             {
               "description": "Coordinate site survey with Josh",
               "due": "2025-06-01",
+              "customer_id": "0010G00002KvKDkQAN"
             },
             {
               "description": "Confirm gear availability for demo",
@@ -37,5 +38,34 @@
         }
       ]
     }
-  ]
+  ],
+  "crm": {
+    "customers": [
+      {
+        "name": "Arvig",
+        "customer_id": "0010G00002KvKDkQAN",
+        "website": "https://www.arvig.com",
+        "contacts": [
+          {
+            "name": "Josh Smith",
+            "title": "Director of Engineering",
+            "email": "jsmith@arvig.com",
+            "phone": "555-123-4567"
+          }
+        ],
+        "notes": [
+          {
+            "date": "2025-05-20",
+            "content": "Discussed upcoming demo windows and timelines."
+          }
+        ],
+        "next_steps": [
+          {
+            "description": "Schedule call with Josh to finalize demo logistics",
+            "due": "2025-05-27"
+          }
+        ]
+      }
+    ]
+  }
 }

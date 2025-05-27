@@ -52,30 +52,6 @@ def render_life_html(life_data: dict, output_path: str, file_prefix: str):
             html.append("</details>")
         html.append("</details>")
 
-    # CRM
-    crm = life_data.get("crm", {})
-    customers = crm.get("customers", [])
-    if customers:
-        html.append("<div class='crm'><h2>🧑‍💼 CRM</h2>")
-        for customer in customers:
-            html.append(f"<details open><summary>{escape(customer['name'])}</summary>")
-            html.append("<ul>")
-            html.append(f"<li><strong>Website:</strong> <a href='{escape(customer['website'])}'>{escape(customer['website'])}</a></li>")
-            for contact in customer.get("contacts", []):
-                html.append(f"<li><strong>Contact:</strong> {escape(contact['name'])} – {escape(contact['title'])} ({escape(contact['email'])}, {escape(contact.get('phone', ''))})</li>")
-            for note in customer.get("notes", []):
-                if isinstance(note, dict):
-                    html.append(f"<li><strong>Note ({escape(note['date'])}):</strong> {escape(note['content'])}</li>")
-                else:
-                    html.append(f"<li><strong>Note:</strong> {escape(note)}</li>")
-            for step in customer.get("next_steps", []):
-                if "due" in step:
-                    html.append(f"<li><strong>Next Step:</strong> {escape(step['description'])} (due: {escape(step['due'])})</li>")
-                else:
-                    html.append(f"<li><strong>Next Step:</strong> {escape(step['description'])}</li>")
-            html.append("</ul></details>")
-        html.append("</div>")
-
     html.append("""
 <script>
 (function () {
